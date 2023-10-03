@@ -3,6 +3,7 @@
 library(tidyverse)
 library(here)
 library(readxl)
+library(lubridate)
 
 data <- read_excel(here("data_raw/Zooplakton_all_data.xlsx"), range = cell_cols("A:AH")) %>% select(-"Counts") # load data
 
@@ -19,6 +20,8 @@ data_tidy <- data_n %>% setNames(new_colnames) # no more spaces in column names
 data_tidy$Counts[data_tidy$Analyzed_by == "Iain" & is.na(data_tidy$Counts) & data_tidy$Species != "A. quadrangularis" & data_tidy$Species != "Diaptomus"] <- 0 # change NA to 0 where applicable
 
 data_tidy$Counts[data_tidy$Species == species_analyzed & is.na(data_tidy$Counts)] <- 0 # change NA to 0 where applicable
+
+data_tidy$Month <- month(data_tidy$Date, label = TRUE) # Add month names
 
 view(data_tidy)
 
