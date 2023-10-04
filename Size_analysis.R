@@ -11,7 +11,7 @@ BodyLengths <- tibble(Species = c("Ceriodaphnia sp.", "C. megalops", "Daphnia cu
 data <- left_join(data_tidy, BodyLengths, by = "Species") # add species body size to the dataframe
 
 data <- mutate(data, SizeClass = case_when(BodyLength <= 0.6 ~ "Small (<= 0.6)",
-                                      BodyLength <= 1.0 ~ "Medium (<= 1.0)",
+                                      BodyLength <= 1.0 ~ "Medium ( 0.6 < x <= 1.0)",
                                       BodyLength > 1.0 ~ "Large (> 1.0)"))
 
 
@@ -25,6 +25,5 @@ summary <- summary %>% mutate("Relative_abundance" = sum_counts / sum_total * 10
 summary %>%
   ggplot(aes(x = Month, y = Relative_abundance, fill = SizeClass)) +
   geom_col(color = "Black", linewidth = 0.05) +
-  labs(y = "Relative abundance (%)") +
-  theme_minimal()+
-  labs(fill = "Size class") # Generate plot of relative abundance per month, not sure about the colors
+  labs(y = "Relative abundance (%)", fill = "Size class") +
+  theme_minimal() # Generate plot of relative abundance per month, not sure about the colors
