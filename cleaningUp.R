@@ -23,6 +23,8 @@ data_tidy$Counts[data_tidy$Species == species_analyzed & is.na(data_tidy$Counts)
 
 data_tidy$Month <- month(data_tidy$Date, label = TRUE) # Add month names
 
+data_tidy$Year<- year(data_tidy$Date) # Add month names
+
 data_tidy <- data_tidy %>%
   mutate(LakeName = case_when(Lake == "BP" ~ "Beeston Pond",
                               Lake == "CH" ~ "Church Pond",

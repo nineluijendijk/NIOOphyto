@@ -1,22 +1,23 @@
 # Analysis of abundances
 
-# Do it seperately per year/lake
+# Do it separately per year/lake
 
 library(tidyverse)
 library(here)
 library(RColorBrewer)
 library(gridExtra)
+library(plotly)
 
 load(file = here("data/data_tidy.RData")) # load object data_tidy
 
-lakes <- unique(data_tidy$Lake)
+lakes <- unique(data_tidy$LakeName)
 
 lakes[3]
 
 plotlist <- list()
 
 for (i in 1:length(lakes)){
-  Ldata <- filter(data_tidy, Lake == lakes[i])
+  Ldata <- filter(data_tidy, LakeName == lakes[i])
 
 # Calculate abundance and relative abundance
 
@@ -34,7 +35,7 @@ getPalette <- colorRampPalette(brewer.pal(9, "Set1")) # prepare color palette
 
 result <- summary %>% ggplot(aes(x = Month, y = Relative_abundance, fill = Species))+
   geom_col(color = "Black", linewidth = 0.05)+
-  labs(y = "Relative abundance (%)", title = paste0("Lake ", lakes[[i]]))+
+  labs(y = "Relative abundance (%)", title = lakes[[i]])+
   theme_minimal()+
   theme(legend.position = "none")+
   scale_fill_manual(values = getPalette(24)) # Generate plot of relative abundance per month, not sure about the colors
@@ -42,5 +43,7 @@ result <- summary %>% ggplot(aes(x = Month, y = Relative_abundance, fill = Speci
 plotlist[[i]] <- result
 }
 
-plot_grid(plotlist = plotlist, ncol = 2)
+ggplotly(plotlist[[1]]) # Generate interactive plot
+
+plot_grid(plotlist = plotlist, ncol = 2) # Show all plots together
 
