@@ -23,6 +23,14 @@ data_tidy$Counts[data_tidy$Species == species_analyzed & is.na(data_tidy$Counts)
 
 data_tidy$Month <- month(data_tidy$Date, label = TRUE) # Add month names
 
+data_tidy <- data_tidy %>%
+  mutate(LakeName = case_when(Lake == "BP" ~ "Beeston Pond",
+                              Lake == "CH" ~ "Church Pond",
+                              Lake == "CL" ~ "Clifton Pond",
+                              Lake == "CN" ~ "Coneries Lake",
+                              Lake == "TP" ~ "Tween Pond",
+                              Lake == "MP" ~ "Main Pond"))
+
 view(data_tidy)
 
 save(data_tidy, file = here("data/data_tidy.RData")) # save tidy dataframe
