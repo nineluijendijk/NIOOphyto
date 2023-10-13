@@ -10,9 +10,9 @@ BodyLengths <- tibble(Species = c("Ceriodaphnia sp.", "C. megalops", "Daphnia cu
 
 data <- left_join(data_tidy, BodyLengths, by = "Species") # add species body size to the dataframe
 
-data <- mutate(data, SizeClass = case_when(BodyLength <= 0.6 ~ "Small (<= 0.6)",
-                                      BodyLength <= 1.0 ~ "Medium ( 0.6 < x <= 1.0)",
-                                      BodyLength > 1.0 ~ "Large (> 1.0)"))
+data <- mutate(data, SizeClass = case_when(BodyLength <= 0.6 ~ "Small (<= 0.6 mm)",
+                                      BodyLength <= 1.0 ~ "Medium ( 0.6 < x <= 1.0 mm)",
+                                      BodyLength > 1.0 ~ "Large (> 1.0 mm)"))
 
 
 summarytot <- data %>% group_by(Species, Month) %>% summarize(sum_total = sum(Total_individuals, na.rm = TRUE))
