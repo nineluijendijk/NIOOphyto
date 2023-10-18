@@ -5,7 +5,6 @@
 library(tidyverse)
 library(here)
 library(RColorBrewer)
-library(cowplot)
 library(plotly)
 
 load(file = here("data/data_tidy.RData")) # load object data_tidy
@@ -47,7 +46,4 @@ for (i in 1:length(lakes)){
   }
 }
 
-for (i in 1:length(plotlist)) {
-  h <- ggplotly(plotlist[[i]])
-  print(h)
-}
+
