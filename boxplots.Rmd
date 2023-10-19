@@ -1,8 +1,15 @@
-# Boxplots for abudant species
+---
+title: "boxplots"
+output: html_document
+date: "2023-10-19"
+---
 
+```{r setup, include=FALSE}
 library(tidyverse)
 library(here)
+```
 
+```{r, message=FALSE}
 load(file = here("data/data_tidy.RData")) # load object data_tidy
 
 data <- data_tidy %>% mutate("Abundance_ind/L" = (Counts / Proportion_of_sample_counted) / Sampling_volume_net_L)
@@ -21,4 +28,4 @@ for (i in topspecies) {
          title = i)
   print(plot)
 }
-
+```

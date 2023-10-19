@@ -21,6 +21,10 @@ data_tidy$Counts[data_tidy$Analyzed_by == "Iain" & is.na(data_tidy$Counts) & dat
 
 data_tidy$Counts[data_tidy$Species == species_analyzed & is.na(data_tidy$Counts)] <- 0 # change NA to 0 where applicable
 
+data_tidy$Species[data_tidy$Species == "Cyclopoid copepods"] <- "Cyclops" # change species name
+data_tidy$Species[data_tidy$Species == "Asplancha spp."] <- "Asplanchna" # change species name
+data_tidy$Species[data_tidy$Species == "Daphnia cullata"] <- "D. cucullata" # change species name
+
 data_tidy$Month <- month(data_tidy$Date, label = TRUE) # Add month names
 
 data_tidy$Year<- year(data_tidy$Date) # Add month names
