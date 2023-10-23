@@ -1,11 +1,10 @@
 ---
 title: "Quick overview of plots"
 output: html_document
-date: "2023-10-13"
+date: '`r Sys.Date()`'
 ---
 
 ```{r, message=FALSE, echo = FALSE, warning=TRUE}
-"devtools::install_github('yihui/htmlwidgets@feature/widget-list')"
 library(tidyverse)
 library(here)
 library(RColorBrewer)
@@ -47,7 +46,7 @@ for (i in 1:length(lakes)){
   
   plotlist[[(length(plotlist)+1)]] <- result
     } else {
-      warning(paste0("No data for ", lakes[[i]], "in the year ", years[[j]]))
+      warning(paste0("No data for ", lakes[[i]], " in the year ", years[[j]]))
     }
   }
 }
