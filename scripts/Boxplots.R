@@ -1,0 +1,32 @@
+# Boxplots for abudant species
+
+library(tidyverse)
+library(here)
+
+load(file = here("data/data_tidy.RData")) # load object data_tidy
+
+data <- data_tidy %>% mutate("Abundance_ind/L" = (Counts / Proportion_of_sample_counted) / Sampling_volume_net_L)
+
+lakes <- unique(data_tidy$LakeName)
+
+plotlist <- list()
+
+for (i in 1:length(lakes)){
+  Ldata <- filter(data, LakeName == lakes[i])
+  
+  summary <- Ldata %>% group_by(Species, Month) %>% summarize(mean_abundance = mean(`Abundance_ind/L`, na.rm = TRUE))
+  
+  topsummary <- Ldata %>% group_by(Species) %>% summarize(mean_topabundance = mean(`Abundance_ind/L`, na.rm = TRUE))
+  topspecies <- topsummary %>% arrange(desc(mean_topabundance)) %>% head(n = 3) %>% .[[1]] # Find the 3 species with the highest abundances
+  
+  for (j in topspecies) {
+    plot <- Ldata %>% filter(Species == j, Counts != 469, Counts != 291) %>% 
+      ggplot(aes(x = Month, y = `Abundance_ind/L`, fill = Month)) +
+      geom_boxplot() +
+      theme(legend.position = "none") +
+      labs(y = "Abundance individuals/L",
+           title = paste0(j, " in ", lakes[[i]]))
+    
+    print(plot)
+  }
+}
