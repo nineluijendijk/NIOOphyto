@@ -1,15 +1,23 @@
 ---
-title: "SizeOverview"
+title: "Overview of abundances of different size categories"
 output: html_document
 date: '`r Sys.Date()`'
 ---
 
-```{r, message=FALSE, echo = FALSE, warning=TRUE}
+### Libraries
+
+The following libraries were used:
+
+```{r, message=FALSE}
 library(tidyverse)
 library(here)
 library(plotly)
 library(htmlwidgets)
+```
 
+### Adding size data
+
+```{r combining the tidy data and size data}
 load(file = here("data/data_tidy.RData")) # load object data_tidy
 
 BodyLengths <- tibble(Species = c("Ceriodaphnia sp.", "C. megalops", "D. cucullata", "D. curvirostris", "D. hyalina var. gellata", "D. hyalina var. lacustris", "D. hyalina", "D. longispina", "D. pulex", "D. magna", "Calanoid copepods", "Cyclops", "Bosmina coregoni", "B. longirostris", "Sida sp.", "S. crystallina", "Chydorus ovalis", "Eurycercus lamellatus", "Alona spp.", "A. quadrangularis", "Asplanchna", "Keratella spp.", "Ostracod", "Diaptomus"),
@@ -19,45 +27,54 @@ data <- left_join(data_tidy, BodyLengths, by = "Species") # add species body siz
 
 data <- mutate(data, SizeClass = case_when(BodyLength <= 0.6 ~ "Small (<= 0.6 mm)",
                                            BodyLength <= 1.0 ~ "Medium ( 0.6 < x <= 1.0 mm)",
-                                           BodyLength > 1.0 ~ "Large (> 1.0 mm)"))
+                                           BodyLength > 1.0 ~ "Large (> 1.0 mm)")) # define different categories of body sizes
+```
 
-lakes <- unique(data_tidy$LakeName)
-years <- unique(data_tidy$Year)
+### Data wrangling and creating plots
 
-plotlist <- list()
+Using nested for loops, R cycles through all six lakes and year by year. It then creates plots of all possible combinations.
 
-for (i in 1:length(lakes)){
+```{r data wrangling and creating plots, warning=TRUE, message=FALSE}
+lakes <- unique(data_tidy$LakeName) # extract the names of the lakes
+years <- unique(data_tidy$Year) # extract the years where counts were measured
+
+plotlist <- list() # create an empty list to add to
+
+for (i in 1:length(lakes)){ # perform the analysis per lake
   Ldata <- filter(data, LakeName == lakes[i])
   
-  for (j in 1:length(years)){
+  for (j in 1:length(years)){ # perform the analysis per year
     Ydata <- filter(Ldata, Year == years[j])
     
-    if (nrow(Ydata) > 0) {
+    if (nrow(Ydata) > 0) { # check if there is any data for this lake/year combination
       
       Xdata <- Ydata %>% mutate("Abundance_ind/L" = (Counts / Proportion_of_sample_counted) / Sampling_volume_net_L,
-                               "Relative_abundance" = Counts / Total_individuals * 100)
+                               "Relative_abundance" = Counts / Total_individuals * 100) # calculate the abundances and relative abundances
       
       summary <- Xdata %>% group_by(Species, SizeClass, Month) %>% summarize(sum_counts = sum(Counts, na.rm = TRUE),
-                                                                 sum_total = sum(Total_individuals, na.rm = TRUE)) # Calculate counts per month
+                                                                 sum_total = sum(Total_individuals, na.rm = TRUE)) # calculate counts per month per species
       
-      summary <- summary %>% group_by(SizeClass, Month, sum_total) %>% summarize(sum_counts = sum(sum_counts, na.rm = TRUE))
+      summary <- summary %>% group_by(SizeClass, Month, sum_total) %>% summarize(sum_counts = sum(sum_counts, na.rm = TRUE)) # calculate counts per month per size class
       
       summary <- summary %>% mutate("Relative_abundance" = sum_counts / sum_total * 100) # Calculate relative abundance per month
+      
       result <- summary %>% ggplot(aes(x = Month, y = Relative_abundance, fill = SizeClass))+
         geom_col(color = "Black", linewidth = 0.05)+
         labs(y = "Relative abundance (%)", title = paste0(lakes[[i]], " in ", years[[j]]))+
-        theme_minimal()
+        theme_minimal() # generate plot of relative abundance per size class per month
       
-      plotlist[[(length(plotlist)+1)]] <- result
+      plotlist[[(length(plotlist)+1)]] <- result # add the plot to the list of plots
     } else {
-      warning(paste0("No data for ", lakes[[i]], " in the year ", years[[j]]))
+      warning(paste0("No data for ", lakes[[i]], " in the year ", years[[j]])) # when there is no data for a lake/year combination, a warning is printed
     }
   }
 }
 ```
 
-``` {r}
+### Interactive plots
+
+The {plotly} package was used to create interactive plots, to make it possible to see the actual values of a bar.
+
+``` {r printing plots, warning=FALSE}
 htmltools::tagList(lapply(1:length(plotlist), function(x) { ggplotly(plotlist[[x]]) }))
 ```
-
-

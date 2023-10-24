@@ -1,32 +1,40 @@
 ---
-title: "boxplots"
+title: "Boxplots of the 3 most abundant species per lake"
 output: html_document
 date: '`r Sys.Date()`'
 ---
 
-```{r setup, include=FALSE}
+### Libraries
+
+The following libraries were used:
+
+```{r setup, message=FALSE}
 library(tidyverse)
 library(here)
 ```
 
-```{r, message=FALSE}
+### Data wrangling and creating plots
+
+Using nested for loops, R cycles through all six lakes and finds the three most abundant species per lake. It then creates boxplots of these three species and their matching lake.
+
+```{r data wrangling and creating boxplots, message=FALSE}
 load(file = here("data/data_tidy.RData")) # load object data_tidy
 
-data <- data_tidy %>% mutate("Abundance_ind/L" = (Counts / Proportion_of_sample_counted) / Sampling_volume_net_L)
+data <- data_tidy %>% mutate("Abundance_ind/L" = (Counts / Proportion_of_sample_counted) / Sampling_volume_net_L) # calculate abundances
 
-lakes <- unique(data_tidy$LakeName)
+lakes <- unique(data_tidy$LakeName) # extract lake names
 
-plotlist <- list()
+plotlist <- list() # create empty list to add plots to
 
 for (i in 1:length(lakes)){
-  Ldata <- filter(data, LakeName == lakes[i])
+  Ldata <- filter(data, LakeName == lakes[i]) # perform the analysis per lake
   
-  summary <- Ldata %>% group_by(Species, Month) %>% summarize(mean_abundance = mean(`Abundance_ind/L`, na.rm = TRUE))
+  summary <- Ldata %>% group_by(Species, Month) %>% summarize(mean_abundance = mean(`Abundance_ind/L`, na.rm = TRUE)) # calculate the mean abundance of each species month
   
-  topsummary <- Ldata %>% group_by(Species) %>% summarize(mean_topabundance = mean(`Abundance_ind/L`, na.rm = TRUE))
+  topsummary <- Ldata %>% group_by(Species) %>% summarize(mean_topabundance = mean(`Abundance_ind/L`, na.rm = TRUE)) # calculate the mean abundance of each species
   topspecies <- topsummary %>% arrange(desc(mean_topabundance)) %>% head(n = 3) %>% .[[1]] # Find the 3 species with the highest abundances
   
-  for (j in topspecies) {
+  for (j in topspecies) { # generate a plot of the 3 most abundant species in the lake
     plot <- Ldata %>% filter(Species == j, Counts != 469, Counts != 291) %>% 
       ggplot(aes(x = Month, y = `Abundance_ind/L`, fill = Month)) +
       geom_boxplot() +
@@ -34,7 +42,7 @@ for (i in 1:length(lakes)){
       labs(y = "Abundance individuals/L",
            title = paste0(j, " in ", lakes[[i]]))
     
-    print(plot)
+    print(plot) # show the plot
   }
 }
 ```
