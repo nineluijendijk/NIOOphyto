@@ -1,0 +1,67 @@
+---
+title: "Diversity indices"
+output: html_document
+date: '`r Sys.Date()`'
+---
+
+### Libraries
+
+The following libraries were used:
+
+```{r setup, message=FALSE}
+library(tidyverse)
+library(here)
+library(vegan)
+```
+
+### Data wrangling and creating plots
+
+Using nested for loops, R cycles through all six lakes and finds the three most abundant species per lake. It then creates boxplots of these three species and their matching lake.
+
+```{r data wrangling and creating, message=FALSE, warning=FALSE, results='asis'}
+load(file = here("data/data_tidy.RData")) # load object data_tidy
+
+lakes <- unique(data_tidy$LakeName)
+
+years <- unique(data_tidy$Year)
+
+for (i in 1:length(lakes)){
+  Ldata <- data_tidy %>% filter(LakeName == lakes[i]) 
+  
+  for (j in 1:length(years)){
+    Ydata <- filter(Ldata, Year == years[j])
+    
+    if (nrow(Ydata) > 0) {
+
+Mdata <- Ydata %>% group_by(Month, Species, LakeName) %>% summarize(Count = sum(Counts, na.rm = TRUE))
+
+summary <- Mdata[c("Month", "Species", "Count")] %>% group_by(Month) %>% summarize(richness = specnumber(Count),
+                                                                        shannon = diversity(Count, index = "shannon"),
+                                                                        simpson = diversity(Count, index = "simpson"),
+                                                                        invsimpson = 1/simpson,
+                                                                        total = sum(Count),
+                                                                        evenness = shannon/log(richness))
+
+result <- summary %>% pivot_longer(cols = c(richness, shannon, simpson, invsimpson, evenness),
+                         names_to = "metric",
+                         values_to = "Count") %>%
+  ggplot(aes(x = total, y = Count))+
+  geom_point()+
+  geom_smooth()+
+  facet_wrap(~metric, nrow = 5, scales = "free_y")+
+  labs(y = "Value",
+       x = "Number of counts",
+       title = paste0(lakes[i], " in ", years[j]))
+
+print(result)
+print(knitr::kable(summary, 
+             format = "markdown",
+             caption = paste0("Diversity indices of ", lakes[i], " in ", years[j]),
+             label = "--------------------------------------------------"))
+
+    } else {
+      warning(paste0("No data for ", lakes[[i]], "in the year ", years[[j]]))
+    }
+  }
+}
+```
