@@ -6,7 +6,7 @@ library(htmlwidgets)
 load(file = here("data/data_tidy.RData")) # load object data_tidy
 
 BodyLengths <- tibble(Species = c("Ceriodaphnia sp.", "C. megalops", "D. cucullata", "D. curvirostris", "D. hyalina var. gellata", "D. hyalina var. lacustris", "D. hyalina", "D. longispina", "D. pulex", "D. magna", "Calanoid copepods", "Cyclops", "Bosmina coregoni", "B. longirostris", "Sida sp.", "S. crystallina", "Chydorus ovalis", "Eurycercus lamellatus", "Alona spp.", "A. quadrangularis", "Asplanchna", "Keratella spp.", "Ostracod", "Diaptomus"),
-                      BodyLength = c(0.7666667, 0.925, 0.975, 1.58, 0.9515, 0.9515, 0.9515, 1.67, 1.2296, 1.3822, 3, 0.9926, 0.725, 0.3551, 2.325, 2.325, 0.475, 1.975, 0.4925, 0.9719, 0.65, 0.2, 1.25, 0.9826)) # species and their body sizes
+                      BodyLength = c(0.4636, 0.925, 0.8593, 1.58, 0.8982, 0.8982, 0.8982, 1.0347, 1.118, 1.4332, 1.0024, 0.9334, 0.423, 0.3838, 0.5075, 0.5075, 0.475, 1.975, 0.7018, 0.8802, 0.4747, 0.3495, 1.25, 1.0024)) # species and their body sizes
 
 data <- left_join(data_tidy, BodyLengths, by = "Species") # add species body size to the dataframe
 
@@ -45,5 +45,3 @@ for (i in 1:length(lakes)){
     }
   }
 }
-
-# subplot(plotlist) 
