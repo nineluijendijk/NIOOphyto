@@ -56,8 +56,7 @@ result <- summary %>% pivot_longer(cols = c(richness, shannon, simpson, invsimps
 print(result)
 print(knitr::kable(summary, 
              format = "markdown",
-             caption = paste0("Diversity indices of ", lakes[i], " in ", years[j]),
-             label = "--------------------------------------------------"))
+             caption = paste0("Diversity indices of ", lakes[i], " in ", years[j])))
 
     } else {
       warning(paste0("No data for ", lakes[[i]], "in the year ", years[[j]]))

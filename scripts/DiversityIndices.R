@@ -2,6 +2,7 @@
 
 # used https://www.youtube.com/watch?v=wq1SXGQYgCs to help with the plots
 # used https://dnr.wisconsin.gov/sites/default/files/topic/Research/lessons_MeasuringBiodiversityEducatorHandout.pdf to find the formula of the evenness index
+# https://onlinelibrary.wiley.com/doi/10.1002/ece3.1155 literature on diversity indices
 # ADD RANKING OF HIGHEST DIVERSITY SCORE
 
 library(tidyverse)
