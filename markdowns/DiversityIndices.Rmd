@@ -53,7 +53,7 @@ result <- summary %>% pivot_longer(cols = c(richness, shannon, simpson, invsimps
        x = "Number of counts",
        title = paste0(lakes[i], " in ", years[j]))
 
-print(result)
+#print(result)
 print(knitr::kable(summary, 
              format = "markdown",
              caption = paste0("Diversity indices of ", lakes[i], " in ", years[j])))
