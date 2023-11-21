@@ -1,24 +1,9 @@
----
-title: "Overview of abundances of different size categories"
-output: html_document
-date: '`r Sys.Date()`'
----
-
-### Libraries
-
-The following libraries were used:
-
-```{r, message=FALSE}
 library(tidyverse)
 library(here)
 library(plotly)
 library(htmlwidgets)
 library(lubridate)
-```
 
-### Adding size data
-
-```{r combining the tidy data and size data}
 load(file = here("data/data_tidy.RData")) # load object data_tidy
 
 BodyLengths <- tibble(Species = c("Ceriodaphnia sp.", "C. megalops", "D. cucullata", "D. curvirostris", "D. hyalina var. gellata", "D. hyalina var. lacustris", "D. hyalina", "D. longispina", "D. pulex", "D. magna", "Calanoid copepods", "Cyclops", "Bosmina coregoni", "B. longirostris", "Sida sp.", "S. crystallina", "Chydorus ovalis", "Eurycercus lamellatus", "Alona spp.", "A. quadrangularis", "Asplanchna", "Keratella spp.", "Ostracod", "Diaptomus"),
@@ -28,18 +13,10 @@ data <- left_join(data_tidy, BodyLengths, by = "Species") # add species body siz
 
 data <- mutate(data, SizeClass = case_when(BodyLength <= 0.6 ~ "Small (<= 0.6 mm)",
                                            BodyLength <= 1.0 ~ "Medium ( 0.6 < x <= 1.0 mm)",
-                                           BodyLength > 1.0 ~ "Large (> 1.0 mm)")) # define different categories of body sizes
-```
-
-### Data wrangling and creating plots
-
-Using nested for loops, R cycles through all six lakes and year by year. It then creates plots of all possible combinations.
-
-```{r data wrangling and creating plots, warning=TRUE, message=FALSE, eval=TRUE}
-lakes <- unique(data_tidy$LakeName) # extract the names of the lakes
-years <- unique(data_tidy$Year) # extract the years where counts were measured
-
-plotlist <- list() # create an empty list to add to
+                                           BodyLength > 1.0 ~ "Large (> 1.0 mm)"))
+plotlist <- list()
+lakes <- unique(data$LakeName)
+years <- unique(data$Year)
 
 for (i in 1:length(lakes)){
   Ldata <- filter(data, LakeName == lakes[i])
@@ -70,18 +47,13 @@ for (i in 1:length(lakes)){
     }
   }
 }
-```
-
-### Interactive plots
-
-The {plotly} package was used to create interactive plots, to make it possible to see the actual values of a bar.
-
-``` {r printing plots, warning=FALSE}
-htmltools::tagList(lapply(1:length(plotlist), function(x) { ggplotly(plotlist[[x]]) }))
-```
 
 
-```{r, message=FALSE}
+
+
+
+# Normal abundance / size class
+
 plotlist <- list()
 lakes <- unique(data$LakeName)
 years <- unique(data$Year)
@@ -111,9 +83,4 @@ for (i in 1:length(lakes)){
     }
   }
 }
-```
-
-```{r}
-htmltools::tagList(lapply(1:length(plotlist), function(x) { ggplotly(plotlist[[x]]) }))
-```
 

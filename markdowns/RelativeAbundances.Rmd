@@ -40,18 +40,18 @@ for (i in 1:length(lakes)){
   data <- Ydata %>% mutate("Abundance_ind/L" = (Counts / Proportion_of_sample_counted) / Sampling_volume_net_L,
                            "Relative_abundance" = Counts / Total_individuals * 100) # calculate the abundances and relative abundances
   
-  summary <- data %>% group_by(Species, Month) %>% summarize(sum_counts = sum(Counts, na.rm = TRUE),
-                                                             sum_total = sum(Total_individuals, na.rm = TRUE)) # calculate counts per month
+  summary <- data %>% group_by(Species, Date) %>% summarize(sum_counts = sum(Counts, na.rm = TRUE),
+                                                             sum_total = sum(Total_individuals, na.rm = TRUE)) # calculate counts per Date
   
-  summary <- summary %>% mutate("Relative_abundance" = sum_counts / sum_total * 100) # calculate relative abundance per month
+  summary <- summary %>% mutate("Relative_abundance" = sum_counts / sum_total * 100) # calculate relative abundance per Date
   
   getPalette <- colorRampPalette(brewer.pal(9, "Set1")) # prepare color palette containing the most distinct colors
   
-  result <- summary %>% ggplot(aes(x = Month, y = Relative_abundance, fill = Species))+
+  result <- summary %>% ggplot(aes(x = Date, y = Relative_abundance, fill = Species))+
     geom_col(color = "Black", linewidth = 0.05)+
     labs(y = "Relative abundance (%)", title = paste0(lakes[[i]], " in ", years[[j]]))+
     theme_minimal()+
-    scale_fill_manual(values = getPalette(24)) # generate plot of relative abundance per month
+    scale_fill_manual(values = getPalette(24)) # generate plot of relative abundance per Date
   
   plotlist[[(length(plotlist)+1)]] <- result # add the plot to the list of plots
   

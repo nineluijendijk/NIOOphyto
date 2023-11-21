@@ -33,9 +33,9 @@ for (i in 1:length(lakes)){
     
     if (nrow(Ydata) > 0) {
 
-Mdata <- Ydata %>% group_by(Month, Species, LakeName) %>% summarize(Count = sum(Counts, na.rm = TRUE))
+Mdata <- Ydata %>% group_by(Date, Species, LakeName) %>% summarize(Count = sum(Counts, na.rm = TRUE))
 
-summary <- Mdata[c("Month", "Species", "Count")] %>% group_by(Month) %>% summarize(richness = specnumber(Count),
+summary <- Mdata[c("Date", "Species", "Count")] %>% group_by(Date) %>% summarize(richness = specnumber(Count),
                                                                         shannon = diversity(Count, index = "shannon"),
                                                                         simpson = diversity(Count, index = "simpson"),
                                                                         invsimpson = 1/simpson,
