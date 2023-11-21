@@ -73,7 +73,7 @@ for (i in 1:length(lakes)){
       
       result <- Pdata %>% ggplot(aes(x = factor(Date), y = `Abundance_ind/L`, fill = SizeClass))+
         geom_col(color = "Black", linewidth = 0.05)+
-        labs(x = "Month", y = "Abundance ind/L", title = paste0(lakes[[1]], " in ", years[[1]]))+
+        labs(x = "Month", y = "Abundance ind/L", title = paste0(lakes[[i]], " in ", years[[j]]))+
         scale_x_discrete(labels = month(Pdata$Date, label = TRUE))+
         theme_minimal()
       
