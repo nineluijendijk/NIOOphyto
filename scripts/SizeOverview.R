@@ -49,9 +49,6 @@ for (i in 1:length(lakes)){
 }
 
 
-
-
-
 # Normal abundance / size class
 
 plotlist <- list()
@@ -84,3 +81,29 @@ for (i in 1:length(lakes)){
   }
 }
 
+# Weighted average
+
+for (i in 1:length(lakes)){
+  Ldata <- filter(data, LakeName == lakes[i])
+  
+  for (j in 1:length(years)){
+    Ydata <- filter(Ldata, Year == years[j])
+    
+    if (nrow(Ydata) > 0) {
+      
+      summary <- Ydata %>% group_by(Species, Date) %>% summarize(sum_counts = sum(Counts, na.rm = TRUE),
+                                                                            sum_total = sum(Total_individuals, na.rm = TRUE))
+      summary <- summary %>% mutate("Relative_abundance" = sum_counts / sum_total * 100) # Calculate relative abundance per Date
+      
+      summaryW <- left_join(summary, BodyLengths, by = "Species")
+      
+      WeightedMean <- summaryW %>% group_by(Date) %>% summarize(WeightedMean = weighted.mean(BodyLength, Relative_abundance))
+      
+      print(paste0("The weighted mean for ", lakes[i], " in ", years[j]))
+      print(WeightedMean)
+      
+    } else {
+      warning(paste0("No data for ", lakes[[i]], " in the year ", years[[j]]))
+    }
+  }
+}
