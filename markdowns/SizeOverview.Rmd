@@ -118,7 +118,7 @@ for (i in 1:length(lakes)){
 htmltools::tagList(lapply(1:length(plotlist), function(x) { ggplotly(plotlist[[x]]) }))
 ```
 
-```{r}
+```{r, results='asis', message=FALSE}
 for (i in 1:length(lakes)){
   Ldata <- filter(data, LakeName == lakes[i])
   
