@@ -9,8 +9,6 @@ library(tidyverse)
 library(here)
 library(plotly)
 library(htmlwidgets)
-library(patchwork)
-library(gridExtra)
 
 load(file = here("data/data_tidy.RData")) # load object data_tidy
 
@@ -24,44 +22,52 @@ data <- mutate(data, SizeClass = case_when(BodyLength <= 0.6 ~ "Small (<= 0.6 mm
                                            BodyLength > 1.0 ~ "Large (> 1.0 mm)"))
 plotlist <- list()
 lakes <- unique(data$LakeName)
-years <- unique(data$Year)
 
 for (i in 1:length(lakes)){
   Ldata <- filter(data, LakeName == lakes[i])
   
-  for (j in 1:length(years)){
-    Ydata <- filter(Ldata, Year == years[j])
+  if (nrow(Ldata) > 0) {
     
-    if (nrow(Ydata) > 0) {
-      
-      summary <- Ydata %>% group_by(Species, SizeClass, Date) %>% summarize(sum_counts = sum(Counts, na.rm = TRUE),
-                                                                            sum_total = sum(Total_individuals, na.rm = TRUE)) # Calculate counts per Date
-      
-      summary <- summary %>% group_by(SizeClass, Date, sum_total) %>% summarize(sum_counts = sum(sum_counts, na.rm = TRUE))
-      
-      summaryV <- Ydata %>% group_by(Species, Date) %>% summarize(sum_counts = sum(Counts, na.rm = TRUE),
-                                                                  sum_total = sum(Total_individuals, na.rm = TRUE))
-      
-      summaryV <- summaryV %>% mutate("Relative_abundance" = sum_counts / sum_total * 100) # Calculate relative abundance per Date
-      
-      summaryW <- left_join(summaryV, BodyLengths, by = "Species")
-      
-      WeightedMean <- summaryW %>% group_by(Date) %>% summarize(WeightedMean_mm = weighted.mean(BodyLength, Relative_abundance))
-      
-      summary <- summary %>% mutate("Relative_abundance" = sum_counts / sum_total * 100) # Calculate relative abundance per Date
-      
-      result <- summary %>% ggplot(aes(x = Date, y = Relative_abundance, fill = SizeClass))+
-        geom_col(color = "Black", linewidth = 0.05)+
-        labs(x = "Month", y = "Relative abundance (%)", title = paste0(lakes[[i]], " in ", years[[j]]))+
-        theme_minimal()
-      
-      tbl <- tableGrob(WeightedMean)
-      
-      print(wrap_plots(result, tbl))
-      
-    } else {
-      warning(paste0("No data for ", lakes[[i]], " in the year ", years[[j]]))
-    }
+    summary <- Ldata %>% group_by(Species, SizeClass, Date) %>% summarize(sum_counts = sum(Counts, na.rm = TRUE),
+                                                                          sum_total = sum(Total_individuals, na.rm = TRUE)) # Calculate counts per Date
+    
+    summary <- summary %>% group_by(SizeClass, Date, sum_total) %>% summarize(sum_counts = sum(sum_counts, na.rm = TRUE))
+    
+    summaryV <- Ldata %>% group_by(Species, Date) %>% summarize(sum_counts = sum(Counts, na.rm = TRUE),
+                                                                sum_total = sum(Total_individuals, na.rm = TRUE))
+    
+    summaryV <- summaryV %>% mutate("Relative_abundance" = sum_counts / sum_total * 100) # Calculate relative abundance per Date
+    
+    summaryW <- left_join(summaryV, BodyLengths, by = "Species")
+    
+    WeightedMean <- summaryW %>% group_by(Date) %>% summarize(WeightedMean_mm = weighted.mean(BodyLength, Relative_abundance))
+    
+    #print(knitr::kable(WeightedMean, 
+    #format = "markdown",
+    #caption = paste0("The weighted mean for ", lakes[i], " in ", years[j])))
+    
+    summary <- summary %>% mutate("Relative_abundance" = sum_counts / sum_total * 100) # Calculate relative abundance per Date
+    
+    scaleFactor <- max(summary$Relative_abundance) / max(WeightedMean$WeightedMean_mm)
+    
+    result <- ggplot()+
+    geom_col(data = summary, aes(x = Date, y = Relative_abundance, fill = SizeClass), color = "black", linewidth = 0.05)+
+    geom_point(data = WeightedMean, aes(x = Date, y = WeightedMean_mm * scaleFactor), color = "darkmagenta")+
+    scale_y_continuous(name = "Relative abundance (%)", sec.axis = sec_axis(~./scaleFactor, name = "Weighted mean in mm"))+
+    theme_minimal()+
+    theme(
+        axis.title.y.right=element_text(color = "darkmagenta"),
+        axis.text.y.right=element_text(color = "darkmagenta"))+
+    labs(x = "Date", title = paste0("Relative abundance of each size class and the weighted means per date of ", lakes[[i]]))
+    
+    plotlist[[(length(plotlist)+1)]] <- result # add the plot to the list of plots
+    
+  } else {
+    warning(paste0("No data for ", lakes[[i]]))
   }
 }
+```
+
+``` {r printing plots, warning=FALSE}
+htmltools::tagList(lapply(1:length(plotlist), function(x) { ggplotly(plotlist[[x]]) }))
 ```
