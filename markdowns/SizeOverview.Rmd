@@ -13,7 +13,6 @@ library(tidyverse)
 library(here)
 library(plotly)
 library(htmlwidgets)
-library(lubridate)
 ```
 
 ### Adding size data
@@ -58,10 +57,9 @@ for (i in 1:length(lakes)){
       summary <- summary %>% group_by(SizeClass, Date, sum_total) %>% summarize(sum_counts = sum(sum_counts, na.rm = TRUE))
       
       summary <- summary %>% mutate("Relative_abundance" = sum_counts / sum_total * 100) # Calculate relative abundance per Date
-      result <- summary %>% ggplot(aes(x = factor(Date), y = Relative_abundance, fill = SizeClass))+
+      result <- summary %>% ggplot(aes(x = Date, y = Relative_abundance, fill = SizeClass))+
         geom_col(color = "Black", linewidth = 0.05)+
-        labs(x = "Month", y = "Relative abundance (%)", title = paste0(lakes[[i]], " in ", years[[j]]))+
-        scale_x_discrete(labels = month(summary$Date, label = TRUE))+
+        labs(x = "Date", y = "Relative abundance (%)", title = paste0(lakes[[i]], " in ", years[[j]]))+
         theme_minimal()
       
       plotlist[[(length(plotlist)+1)]] <- result
@@ -100,10 +98,9 @@ for (i in 1:length(lakes)){
       Xdata <- left_join(summary, Zdata, by = "Date")
       Pdata <- Xdata %>% mutate("Abundance_ind/L" = (CountsClass / Proportion_of_sample_counted) / Sampling_volume_net_L)
       
-      result <- Pdata %>% ggplot(aes(x = factor(Date), y = `Abundance_ind/L`, fill = SizeClass))+
+      result <- Pdata %>% ggplot(aes(x = Date, y = `Abundance_ind/L`, fill = SizeClass))+
         geom_col(color = "Black", linewidth = 0.05)+
-        labs(x = "Month", y = "Abundance ind/L", title = paste0(lakes[[i]], " in ", years[[j]]))+
-        scale_x_discrete(labels = month(Pdata$Date, label = TRUE))+
+        labs(x = "Date", y = "Abundance ind/L", title = paste0(lakes[[i]], " in ", years[[j]]))+
         theme_minimal()
       
       plotlist[[(length(plotlist)+1)]] <- result
