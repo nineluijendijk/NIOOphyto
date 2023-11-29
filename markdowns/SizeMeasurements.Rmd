@@ -77,18 +77,10 @@ ggplot(data = percentagesF, aes(x = SizeR / 1000, y = Rfreq))+
 <details>
 
 ```{r}
-plotRfreq <- function(lake = "CL") {
+plotRfreqLake <- function(lake = "CL") {
   dataF <- filter(data_tidy, Lake == lake)
-  summary <- dataF %>% group_by(Species) %>% summarize(mean = mean(Size, na.rm = TRUE),
-                                                           stdev = sd(Size, na.rm = TRUE),
-                                                           min = min(Size, na.rm = TRUE),
-                                                           max = max(Size, na.rm = TRUE)) # calculate mean, stdev, min and max of each species
   
   dataF$SizeR <- plyr::round_any(dataF$Size, accuracy = 100) # round body sizes to create groups
-  
-  ggplot(data = dataF, aes(x = Size, fill = By))+
-    geom_histogram(binwidth = 50, alpha = 1, position = "stack")+ # the histograms are stacked, not overlapped!
-    labs(y = "Frequency", x = "Body Length in µm", title = "Measured body lengths shown in stacked histograms rather than overlapped")
   
   counts <- plyr::count(dataF$SizeR) # count how many times a body size was measured
   total <- sum(!is.na(dataF$SizeR))
@@ -114,7 +106,40 @@ plotRfreq <- function(lake = "CL") {
 lakes <- unique(data_tidy$Lake)
 
 for (i in lakes) {
-  print(plotRfreq(lake = i))
+  print(plotRfreqLake(lake = i))
+}
+```
+
+# Measurement distribution per Species
+
+```{r}
+plotRfreqSpecies <- function(species = "D. hyalina") {
+  dataF <- filter(data_tidy, Species == species)
+  
+  dataF$SizeR <- plyr::round_any(dataF$Size, accuracy = 100) # round body sizes to create groups
+  
+  counts <- plyr::count(dataF$SizeR) # count how many times a body size was measured
+  total <- sum(!is.na(dataF$SizeR))
+  percentages <- counts %>% mutate("Rfreq" = freq / (total / 100)) # find the % of how many times a body size was measured
+  colnames(percentages)[1] <- "SizeR"
+  percentagesF <- filter(percentages, Rfreq >= 1.0) # filter for body sizes measured over 1% of the time
+  
+  # left_join(dataF, percentages, by = "SizeR")
+  
+  ggplot(data = percentagesF, aes(x = SizeR / 1000, y = Rfreq))+
+    geom_col()+
+    scale_x_continuous(breaks = seq(0, 3, 0.2), limits = c(0, 3.2))+
+    scale_y_continuous(breaks = seq(0, 100, 5))+
+    labs(y = "Frequency %", x = "Body Length in mm", 
+         title = paste0("Distribution of ", species, " body size measurements"))
+}
+```
+
+```{r, warning=FALSE}
+species <- unique(data_tidy$Species)
+
+for (i in species) {
+  print(plotRfreqSpecies(species = i))
 }
 ```
 
