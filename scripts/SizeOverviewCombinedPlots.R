@@ -20,8 +20,6 @@ for (i in 1:length(lakes)){
   
   if (nrow(Ldata) > 0) {
     
-    print(lakes[[i]])
-    
     summary <- Ldata %>% group_by(Species, SizeClass, Date) %>% summarize(sum_counts = sum(Counts, na.rm = TRUE),
                                                                           sum_total = sum(Total_individuals, na.rm = TRUE)) # Calculate counts per Date
     
@@ -44,10 +42,14 @@ for (i in 1:length(lakes)){
     geom_col(data = summary, aes(x = Date, y = Relative_abundance, fill = SizeClass), color = "black", linewidth = 0.05)+
     geom_point(data = WeightedMean, aes(x = Date, y = WeightedMean_mm * scaleFactor), color = "darkmagenta")+
     scale_y_continuous(name = "Relative abundance (%)", sec.axis = sec_axis(~./scaleFactor, name = "Weighted mean in mm"))+
+    scale_x_datetime(limits = c(as.POSIXct("2005-03-01", format = "%Y-%m-%d"), NA),
+                     date_labels = "%d-%m-%y",
+                     breaks = unique(summary$Date))+
     theme_minimal()+
     theme(
         axis.title.y.right=element_text(color = "darkmagenta"),
-        axis.text.y.right=element_text(color = "darkmagenta"))+
+        axis.text.y.right=element_text(color = "darkmagenta"),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
     labs(x = "Date", title = paste0("Relative abundance of each size class and the weighted means per date of ", lakes[[i]]))
     
     print(result)
@@ -84,10 +86,14 @@ for (i in 1:length(lakes)){
       geom_col(data = Pdata, aes(x = Date, y = `Abundance_ind/L`, fill = SizeClass), color = "black", linewidth = 0.05)+
       geom_point(data = WeightedMean, aes(x = Date, y = WeightedMean_mm * scaleFactor), color = "darkmagenta")+
       scale_y_continuous(name = "Abundance ind/L", sec.axis = sec_axis(~./scaleFactor, name = "Weighted mean in mm"))+
+      scale_x_datetime(limits = c(as.POSIXct("2005-03-01", format = "%Y-%m-%d"), NA),
+                       date_labels = "%d-%m-%y",
+                       breaks = unique(summary$Date))+
       theme_minimal()+
       theme(
         axis.title.y.right=element_text(color = "darkmagenta"),
-        axis.text.y.right=element_text(color = "darkmagenta"))+
+        axis.text.y.right=element_text(color = "darkmagenta"),
+        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
       labs(x = "Date", title = paste0("Abundance of each size class and the weighted means per date of ", lakes[[i]]))
     
     print(result)
