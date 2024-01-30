@@ -54,8 +54,8 @@ for (i in 1:length(lakes)){
     scale_fill_manual(values = getPalette(24)) # generate plot of relative abundance per Date
   
   plotlist[[(length(plotlist)+1)]] <- result # add the plot to the list of plots
-  
-    } else {
+
+      } else {
       warning(paste0("No data for ", lakes[[i]], " in the year ", years[[j]])) # when there is no data for a lake/year combination, a warning is printed
     }
   }

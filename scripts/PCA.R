@@ -30,10 +30,10 @@ data_wide <- pivot_wider(data = select(data_extra, -Counts, -"Relative_abundance
 data_wide$Combined <- paste(data_wide$Lake, data_wide$Date)
 data_wide <- na.omit(data_wide)
 
-data <- as.data.frame(data_wide[14:37])
+data <- as.data.frame(data_wide[14:34])
 rownames(data) <- data$Combined
 
-write_xlsx(data, here("data/data_matrix.xlsx"))
+#write_xlsx(data, here("data/data_matrix.xlsx"))
 
 data_matrix <- as.matrix(data[2:20])
 
