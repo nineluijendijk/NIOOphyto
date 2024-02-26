@@ -13,7 +13,9 @@ data <- select(data, `OC sed. rate (g C m-2 d-1)`, Combined)
 
 dataF <- filter(data, Combined %in% overlap)
 
-write_xlsx(dataF, here("data/dataRDAOverlap.xlsx"))
+dataT <- tibble(dataF$Combined, dataF$`OC sed. rate (g C m-2 d-1)`)
+
+dataR <- arrange(dataT, `dataF$Combined`)
 
 
 load(file = here("data/data_tidy.RData")) # load object data_tidy
@@ -40,4 +42,10 @@ data2 <- as.data.frame(data_wide[14:34])
 
 data2F <- filter(data2, Combined %in% overlap)
 
-write_xlsx(data2F, here("data/data_matrixRDAOverlap.xlsx"))
+data2T <- tibble(data2F$Combined, data2F[1:20])
+
+data2R <- arrange(data2T, `data2F$Combined`)
+
+write_xlsx(dataR, here("data/dataRDAOverlap.xlsx"))
+
+write_xlsx(data2R, here("data/data_matrixRDAOverlap.xlsx"))
